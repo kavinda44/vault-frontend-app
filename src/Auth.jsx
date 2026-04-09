@@ -52,7 +52,6 @@ export default function Auth({ setLoggedInUser }) {
             const response = await fetch("https://vault-backend-api-szxu.onrender.com/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                
                 body: JSON.stringify({ username: regUser, email: regEmail, nic: regNic, password: regPass })
             });
             const data = await response.json();
@@ -85,109 +84,87 @@ export default function Auth({ setLoggedInUser }) {
     };
 
     return (
-        // Added flex layout, min-height, and padding for mobile spacing
-        <div className="auth-wrapper flex items-center justify-center min-h-screen w-full bg-[#f8f9fc] p-4 sm:p-8 overflow-hidden">
+        <div className="auth-wrapper">
             
-            {/* Added max-width constraints so it shrinks safely on mobile phones */}
-            <div className={`container relative w-full max-w-[768px] min-h-[600px] sm:min-h-[550px] bg-white rounded-3xl shadow-2xl overflow-hidden ${isPanelActive ? "active" : ""}`} id="container">
+            <div className={`container ${isPanelActive ? "active" : ""}`} id="container">
                 
                 <div className="form-container sign-up">
-                    <form onSubmit={handleRegister} className="flex flex-col items-center justify-center h-full px-6 sm:px-12 text-center">
-                        <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-slate-900">Create Account</h1>
+                    <form onSubmit={handleRegister}>
+                        <div className="mobile-header">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Secure Enrollment
+                        </div>
+                        
+                        <h1>Create Account</h1>
                       
-                        <input 
-                            type="text" placeholder="Username" required
-                            className="w-full max-w-[320px] bg-slate-100 border-none my-2 py-3 px-4 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                            value={regUser} onChange={(e) => setRegUser(e.target.value)} 
-                        />
-                        <input 
-                            type="email" placeholder="Email" required
-                            className="w-full max-w-[320px] bg-slate-100 border-none my-2 py-3 px-4 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                            value={regEmail} onChange={(e) => setRegEmail(e.target.value)} 
-                        />
-                       
-                        <input 
-                            type="text" placeholder="NIC Number" required
-                            className="w-full max-w-[320px] bg-slate-100 border-none my-2 py-3 px-4 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                            value={regNic} onChange={(e) => setRegNic(e.target.value)} 
-                        />
-                        <input 
-                            type="password" placeholder="Password" required
-                            className="w-full max-w-[320px] bg-slate-100 border-none my-2 py-3 px-4 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                            value={regPass} onChange={(e) => setRegPass(e.target.value)} 
-                        />
-                        <button type="submit" className="mt-4 bg-blue-600 text-white rounded-full px-10 py-3 text-xs sm:text-sm font-bold uppercase tracking-widest hover:bg-blue-700 transition-transform active:scale-95">
-                            Sign Up
-                        </button>
-
-                        {isPanelActive && <p className="text-red-500 text-xs sm:text-sm mt-3 font-medium px-4">{message}</p>}
+                        <input type="text" placeholder="Username" required value={regUser} onChange={(e) => setRegUser(e.target.value)} />
+                        <input type="email" placeholder="Email" required value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
+                        <input type="text" placeholder="NIC Number" required value={regNic} onChange={(e) => setRegNic(e.target.value)} />
+                        <input type="password" placeholder="Password" required value={regPass} onChange={(e) => setRegPass(e.target.value)} />
+                        
+                        <button type="submit">Sign Up</button>
+                        {isPanelActive && <p style={{color: 'red', fontSize: '13px', marginTop: '15px'}}>{message}</p>}
                     </form>
                 </div>
 
                 <div className="form-container sign-in">
                     
                     {isForgotMode ? (
-                        <form onSubmit={handleForgotPassword} className="flex flex-col items-center justify-center h-full px-6 sm:px-12 text-center">
-                            <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-slate-900">Reset Password</h1>
-                            <span className="text-xs sm:text-sm text-slate-500 mb-6 px-4">Enter your email to receive a secure reset link.</span>
+                        <form onSubmit={handleForgotPassword}>
+                            <div className="mobile-header">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+                                Account Recovery
+                            </div>
                             
-                            <input 
-                                type="email" placeholder="Email Address" required
-                                className="w-full max-w-[320px] bg-slate-100 border-none my-2 py-3 px-4 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                                value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} 
-                            />
-                            <button type="submit" className="mt-4 bg-blue-600 text-white rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-widest hover:bg-blue-700 transition-transform active:scale-95">
-                                Send Reset Link
-                            </button>
+                            <h1>Reset Password</h1>
+                            <span style={{marginBottom: '20px'}}>Enter your email to receive a secure reset link.</span>
                             
-                            <a href="#" className="mt-6 text-sm text-slate-600 hover:text-blue-600 transition-colors" onClick={(e) => { e.preventDefault(); setIsForgotMode(false); setMessage(''); }}>
+                            <input type="email" placeholder="Email Address" required value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} />
+                            <button type="submit">Send Reset Link</button>
+                            
+                            <a href="#" onClick={(e) => { e.preventDefault(); setIsForgotMode(false); setMessage(''); }}>
                                 ← Back to Sign In
                             </a>
                             
-                            <p className="text-green-600 text-xs sm:text-sm mt-4 font-medium px-4">{message}</p>
+                            <p style={{color: 'green', fontSize: '13px', marginTop: '15px'}}>{message}</p>
                         </form>
                     ) : (
-                        <form onSubmit={handleLogin} className="flex flex-col items-center justify-center h-full px-6 sm:px-12 text-center">
-                            <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-slate-900">Sign In</h1>
+                        <form onSubmit={handleLogin}>
+                            <div className="mobile-header">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Secure Vault Login
+                            </div>
                             
-                            <input 
-                                type="text" placeholder="Username" required
-                                className="w-full max-w-[320px] bg-slate-100 border-none my-2 py-3 px-4 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                                value={loginUser} onChange={(e) => setLoginUser(e.target.value)} 
-                            />
-                            <input 
-                                type="password" placeholder="Password" required
-                                className="w-full max-w-[320px] bg-slate-100 border-none my-2 py-3 px-4 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                                value={loginPass} onChange={(e) => setLoginPass(e.target.value)} 
-                            />
+                            <h1>Sign In</h1>
                             
-                            <a href="#" className="mt-4 mb-2 text-sm text-slate-500 hover:text-blue-600 transition-colors" onClick={(e) => { e.preventDefault(); setIsForgotMode(true); setMessage(''); }}>
+                            <input type="text" placeholder="Username" required value={loginUser} onChange={(e) => setLoginUser(e.target.value)} />
+                            <input type="password" placeholder="Password" required value={loginPass} onChange={(e) => setLoginPass(e.target.value)} />
+                            
+                            <a href="#" onClick={(e) => { e.preventDefault(); setIsForgotMode(true); setMessage(''); }}>
                                 Forget Your Password?
                             </a>
                             
-                            <button type="submit" className="mt-2 bg-blue-600 text-white rounded-full px-12 py-3 text-xs sm:text-sm font-bold uppercase tracking-widest hover:bg-blue-700 transition-transform active:scale-95">
-                                Sign In
-                            </button>
+                            <button type="submit">Sign In</button>
                             
-                            {!isPanelActive && <p className="text-red-500 text-xs sm:text-sm mt-4 font-medium px-4">{message}</p>}
+                            {!isPanelActive && <p style={{color: 'red', fontSize: '13px', marginTop: '15px'}}>{message}</p>}
                         </form>
                     )}
                 </div>
 
+                {/* THE OVERLAY IS BACK (And handles the vertical slide on mobile!) */}
                 <div className="toggle-container">
                     <div className="toggle">
-                        <div className="toggle-panel toggle-left flex flex-col items-center justify-center px-6 sm:px-10 text-center">
-                            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">Welcome Back!</h1>
-                            <p className="text-sm sm:text-base text-white/90 mb-8 leading-relaxed">Enter your personal details to use all of site features</p>
-                            
-                            <button className="ghost border-2 border-white text-white rounded-full px-10 py-3 text-xs sm:text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-colors" onClick={() => { setIsPanelActive(false); setIsForgotMode(false); setMessage(''); }}>
+                        <div className="toggle-panel toggle-left">
+                            <h1>Welcome Back!</h1>
+                            <p>Enter your personal details to use all of site features</p>
+                            <button className="ghost" onClick={() => { setIsPanelActive(false); setIsForgotMode(false); setMessage(''); }}>
                                 Sign In
                             </button>
                         </div>
-                        <div className="toggle-panel toggle-right flex flex-col items-center justify-center px-6 sm:px-10 text-center">
-                            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">Welcome!</h1>
-                            <p className="text-sm sm:text-base text-white/90 mb-8 leading-relaxed">Register with your personal details to use all of site features</p>
-                            <button className="ghost border-2 border-white text-white rounded-full px-10 py-3 text-xs sm:text-sm font-bold uppercase tracking-widest hover:bg-white/10 transition-colors" onClick={() => setIsPanelActive(true)}>
+                        <div className="toggle-panel toggle-right">
+                            <h1>Welcome!</h1>
+                            <p>Register with your personal details to open a secure account</p>
+                            <button className="ghost" onClick={() => setIsPanelActive(true)}>
                                 Sign Up
                             </button>
                         </div>
