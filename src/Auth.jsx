@@ -151,7 +151,6 @@ export default function Auth({ setLoggedInUser }) {
                     )}
                 </div>
 
-                {/* THE OVERLAY IS BACK (And handles the vertical slide on mobile!) */}
                 <div className="toggle-container">
                     <div className="toggle">
                         <div className="toggle-panel toggle-left">
@@ -172,6 +171,21 @@ export default function Auth({ setLoggedInUser }) {
                 </div>
 
             </div>
+
+            {/* ADDED: Google Safe Browsing Disclaimer Footer */}
+            <div style={{ 
+                marginTop: '25px', 
+                color: '#475569', 
+                fontSize: '12px', 
+                textAlign: 'center', 
+                maxWidth: '600px', 
+                padding: '0 15px',
+                lineHeight: '1.5',
+                zIndex: 10 
+            }}>
+                ⚠️ <strong>Disclaimer:</strong> This is a simulated application built solely for a university student security project. No real financial, personal, or sensitive data is collected, stored, or processed.
+            </div>
+
         </div>
     );
 }
