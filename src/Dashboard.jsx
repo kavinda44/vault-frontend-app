@@ -3,7 +3,7 @@ import {
   LayoutGrid, ArrowLeftRight, ShieldCheck, LogOut, 
   Search, Lock, Bell, User, DollarSign, CheckCircle2, X, 
   ArrowUpRight, ArrowDownLeft, FileText, Settings as SettingsIcon,
-  Moon, Sun, Menu // <-- Added Menu icon for mobile
+  Moon, Sun, Menu, RefreshCw // <-- Added RefreshCw icon
 } from 'lucide-react';
 
 import Transfer from './Transfer';
@@ -40,6 +40,9 @@ export default function Dashboard({ user, handleLogout }) {
   const username = currentUser.username;
   const accountNumber = currentUser.accountNumber;
   const [currentBalance, setCurrentBalance] = useState(currentUser.balance);
+  
+  // --- NEW: REFRESH STATE ---
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [activePage, setActivePage] = useState('home'); 
   
@@ -67,7 +70,30 @@ export default function Dashboard({ user, handleLogout }) {
   const navigateTo = (page) => {
     setActivePage(page);
     setIsTransferModalOpen(false);
-    setIsMobileMenuOpen(false); // Close mobile menu on navigation
+    setIsMobileMenuOpen(false); 
+  };
+
+  // --- NEW: REFRESH FUNCTION ---
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/refresh-account/${username}`);
+      if (response.ok) {
+        const data = await response.json();
+        // Instantly update the UI balance
+        setCurrentBalance(data.balance);
+        // Update the master user object in state/localstorage
+        setCurrentUser(prevUser => ({
+          ...prevUser,
+          balance: data.balance
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to refresh account:", error);
+    } finally {
+      // Add a tiny delay so the spin animation feels satisfying
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
   };
 
   const handleModalRequestTransfer = async (e) => {
@@ -232,6 +258,17 @@ export default function Dashboard({ user, handleLogout }) {
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-8">
                     <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Digital Vault Account</span>
                     <span className={`px-3 py-1 rounded text-sm font-mono tracking-widest w-fit ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>{accountNumber}</span>
+                    
+                    {/* NEW: SYNC BALANCE BUTTON */}
+                    <button 
+                      onClick={handleRefresh}
+                      disabled={isRefreshing}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-blue-400' : 'bg-blue-50 hover:bg-blue-100 text-blue-600'}`}
+                    >
+                      <RefreshCw size={16} className={isRefreshing ? "animate-spin" : ""} />
+                      {isRefreshing ? "Syncing..." : "Sync Balance"}
+                    </button>
+                    
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 z-10 relative">
                     <button onClick={() => setIsTransferModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-medium shadow-sm transition-colors flex items-center justify-center gap-2">
@@ -346,7 +383,7 @@ export default function Dashboard({ user, handleLogout }) {
 
               <h2 className={`text-lg sm:text-xl font-bold mb-4 sm:mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Recent Activity</h2>
               
-              {/* RECENT ACTIVITY LIST (Converted to Flexbox for superior mobile scaling) */}
+              {/* RECENT ACTIVITY LIST */}
               <div className={`rounded-2xl shadow-sm border overflow-hidden mb-12 transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
                 <div className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-100'}`}>
                   {myHistory.map((tx) => {
