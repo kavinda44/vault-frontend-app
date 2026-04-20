@@ -3,7 +3,7 @@ import {
   LayoutGrid, ArrowLeftRight, ShieldCheck, LogOut, 
   Search, Lock, Bell, User, DollarSign, CheckCircle2, X, 
   ArrowUpRight, ArrowDownLeft, FileText, Settings as SettingsIcon,
-  Moon, Sun, Menu, RefreshCw // <-- Added RefreshCw icon
+  Moon, Sun, Menu, RefreshCw 
 } from 'lucide-react';
 
 import Transfer from './Transfer';
@@ -34,27 +34,37 @@ export default function Dashboard({ user, handleLogout }) {
     localStorage.setItem('vault_dark_mode', JSON.stringify(isDarkMode));
   }, [isDarkMode]);
 
-  // --- MOBILE MENU STATE ---
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const username = currentUser.username;
   const accountNumber = currentUser.accountNumber;
   const [currentBalance, setCurrentBalance] = useState(currentUser.balance);
   
-  // --- NEW: REFRESH STATE ---
   const [isRefreshing, setIsRefreshing] = useState(false);
-
   const [activePage, setActivePage] = useState('home'); 
   
-  const [globalHistory, setGlobalHistory] = useState(() => {
-    const saved = localStorage.getItem(`vault_global_history`);
-    if (saved) return JSON.parse(saved);
-    return []; 
-  });
+  // --- UPGRADED: GLOBAL DATABASE HISTORY STATE ---
+  const [myHistory, setMyHistory] = useState([]);
 
+  const fetchGlobalHistory = async () => {
+    try {
+      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/history/${username}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMyHistory(data.history);
+      }
+    } catch (error) {
+      console.error("Failed to fetch history:", error);
+    }
+  };
+
+  // Fetch the real history when the dashboard loads
   useEffect(() => {
-    localStorage.setItem(`vault_global_history`, JSON.stringify(globalHistory));
-  }, [globalHistory]);
+    if (username) {
+      fetchGlobalHistory();
+    }
+  }, [username]);
+  // ----------------------------------------------
 
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [modalRecipient, setModalRecipient] = useState('');
@@ -65,33 +75,32 @@ export default function Dashboard({ user, handleLogout }) {
   const [modalOtpMode, setModalOtpMode] = useState(false);
   const [modalOtpCode, setModalOtpCode] = useState('');
 
-  const myHistory = globalHistory.filter(tx => tx.sender === username || tx.recipient === accountNumber);
-
   const navigateTo = (page) => {
     setActivePage(page);
     setIsTransferModalOpen(false);
     setIsMobileMenuOpen(false); 
   };
 
-  // --- NEW: REFRESH FUNCTION ---
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
+      // 1. Fetch the freshest balance
       const response = await fetch(`https://vault-backend-api-szxu.onrender.com/refresh-account/${username}`);
       if (response.ok) {
         const data = await response.json();
-        // Instantly update the UI balance
         setCurrentBalance(data.balance);
-        // Update the master user object in state/localstorage
         setCurrentUser(prevUser => ({
           ...prevUser,
           balance: data.balance
         }));
       }
+      
+      // 2. Fetch the freshest transaction logs
+      await fetchGlobalHistory();
+      
     } catch (error) {
       console.error("Failed to refresh account:", error);
     } finally {
-      // Add a tiny delay so the spin animation feels satisfying
       setTimeout(() => setIsRefreshing(false), 500);
     }
   };
@@ -103,7 +112,7 @@ export default function Dashboard({ user, handleLogout }) {
       const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username, recipient_account: modalRecipient, amount: modalAmount })
+        body: JSON.stringify({ username: username, recipient_account: modalRecipient, amount: modalAmount, description: modalDesc || 'Quick Transfer' })
       });
       if (response.ok) {
         setModalStatus("OTP sent to your registered email.");
@@ -128,21 +137,14 @@ export default function Dashboard({ user, handleLogout }) {
         body: JSON.stringify({ username: username, otp: modalOtpCode })
       });
       const data = await response.json();
+      
       if (response.ok) {
         setModalStatus(" " + data.message);
         setModalPayload(data.raw_encrypted_payload);
         setCurrentBalance(prev => prev - parseFloat(modalAmount));
         
-        const newTx = {
-            id: `TRX-${Math.floor(10000 + Math.random() * 90000)}`,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            sender: username,
-            recipient: modalRecipient,
-            amount: parseFloat(modalAmount),
-            desc: modalDesc || 'Quick Transfer',
-            status: 'Settled'
-        };
-        setGlobalHistory(prevHistory => [newTx, ...prevHistory]);
+        // UPGRADED: Pull the real history from the database instead of faking it!
+        await fetchGlobalHistory();
         
         setModalAmount('');
         setModalRecipient('');
@@ -160,7 +162,6 @@ export default function Dashboard({ user, handleLogout }) {
   return (
     <div className={`flex h-screen font-sans transition-colors duration-300 overflow-hidden ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-[#f8f9fc] text-slate-800'}`}>
       
-      {/* MOBILE OVERLAY */}
       {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden" 
@@ -168,7 +169,6 @@ export default function Dashboard({ user, handleLogout }) {
         />
       )}
 
-      {/* SIDEBAR */}
       <aside className={`fixed md:relative w-64 h-full border-r flex flex-col justify-between z-50 transition-all duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         <div className="overflow-y-auto">
           <div className={`p-6 border-b flex items-center justify-between ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
@@ -176,7 +176,7 @@ export default function Dashboard({ user, handleLogout }) {
               <h1 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Digital Vault</h1>
               <p className={`text-sm mt-1 truncate ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Hi, {username}</p>
             </div>
-            {/* Close button for mobile */}
+            
             <button className="md:hidden p-1 rounded-lg" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={24} className={isDarkMode ? 'text-slate-400' : 'text-slate-500'} />
             </button>
@@ -210,7 +210,6 @@ export default function Dashboard({ user, handleLogout }) {
 
       <main className="flex-1 flex flex-col min-w-0">
         
-        {/* HEADER */}
         <header className={`h-16 sm:h-20 border-b flex items-center justify-between px-4 sm:px-8 shrink-0 transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
           <div className="flex items-center gap-2 sm:gap-4">
             <button className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => setIsMobileMenuOpen(true)}>
@@ -259,7 +258,6 @@ export default function Dashboard({ user, handleLogout }) {
                     <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Digital Vault Account</span>
                     <span className={`px-3 py-1 rounded text-sm font-mono tracking-widest w-fit ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>{accountNumber}</span>
                     
-                    {/* NEW: SYNC BALANCE BUTTON */}
                     <button 
                       onClick={handleRefresh}
                       disabled={isRefreshing}
@@ -383,7 +381,6 @@ export default function Dashboard({ user, handleLogout }) {
 
               <h2 className={`text-lg sm:text-xl font-bold mb-4 sm:mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Recent Activity</h2>
               
-              {/* RECENT ACTIVITY LIST */}
               <div className={`rounded-2xl shadow-sm border overflow-hidden mb-12 transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
                 <div className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-100'}`}>
                   {myHistory.map((tx) => {
@@ -422,9 +419,12 @@ export default function Dashboard({ user, handleLogout }) {
             <Transfer 
               user={currentUser} 
               currentBalance={currentBalance} 
-              globalHistory={globalHistory}
-              setGlobalHistory={setGlobalHistory}
-              onTransferSuccess={(amountDeducted) => setCurrentBalance(prev => prev - amountDeducted)} 
+              globalHistory={myHistory} // UPGRADED
+              setGlobalHistory={setMyHistory} 
+              onTransferSuccess={(amountDeducted) => {
+                setCurrentBalance(prev => prev - amountDeducted);
+                fetchGlobalHistory(); // Auto-refreshes history when Transfer component finishes!
+              }} 
               isDarkMode={isDarkMode}
             />
           )}
@@ -432,7 +432,7 @@ export default function Dashboard({ user, handleLogout }) {
           {activePage === 'statements' && (
             <Statements 
               user={currentUser} 
-              myHistory={myHistory} 
+              myHistory={myHistory} // UPGRADED
               isDarkMode={isDarkMode}
             />
           )}
@@ -455,7 +455,6 @@ export default function Dashboard({ user, handleLogout }) {
         </div>
       </main>
 
-      {/* QUICK TRANSFER MODAL */}
       {isTransferModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className={`w-full max-w-md rounded-2xl shadow-2xl overflow-hidden relative transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border border-slate-800' : 'bg-white'}`}>

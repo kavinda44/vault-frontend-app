@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Moon, Sun, Bell, Shield, Smartphone, Mail, Key } from 'lucide-react';
 
 export default function Settings({ isDarkMode, toggleDarkMode }) {
-  // Local state for the fake settings
+
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [smsAlerts, setSmsAlerts] = useState(false);
   const [twoFactor, setTwoFactor] = useState(true);
 
-  // A reusable Toggle Switch component
+
   const ToggleSwitch = ({ enabled, onChange }) => (
     <button 
       onClick={onChange}
@@ -31,7 +31,7 @@ export default function Settings({ isDarkMode, toggleDarkMode }) {
 
       <div className="space-y-4 sm:space-y-6">
         
-        {/* Appearance Section */}
+       
         <div className={`rounded-2xl p-5 sm:p-8 shadow-sm border transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
           <h3 className={`text-xs sm:text-sm font-bold tracking-wider uppercase mb-4 sm:mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Appearance</h3>
           
@@ -49,7 +49,7 @@ export default function Settings({ isDarkMode, toggleDarkMode }) {
           </div>
         </div>
 
-        {/* Notifications Section */}
+        
         <div className={`rounded-2xl p-5 sm:p-8 shadow-sm border transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
           <h3 className={`text-xs sm:text-sm font-bold tracking-wider uppercase mb-4 sm:mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Notifications</h3>
           
@@ -84,7 +84,7 @@ export default function Settings({ isDarkMode, toggleDarkMode }) {
           </div>
         </div>
 
-        {/* Security Summary Section */}
+        
         <div className={`rounded-2xl p-5 sm:p-8 shadow-sm border transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
           <h3 className={`text-xs sm:text-sm font-bold tracking-wider uppercase mb-4 sm:mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Security Settings</h3>
           

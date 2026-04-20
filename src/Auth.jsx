@@ -172,7 +172,7 @@ export default function Auth({ setLoggedInUser }) {
 
             </div>
 
-            {/* ADDED: Google Safe Browsing Disclaimer Footer */}
+            
             <div style={{ 
                 marginTop: '25px', 
                 color: '#475569', 

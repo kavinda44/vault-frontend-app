@@ -3,17 +3,17 @@ import { Search, Download, ArrowUpRight, ArrowDownLeft, FileText, Filter } from 
 
 export default function Statements({ user, myHistory, isDarkMode }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('ALL'); // 'ALL', 'CREDIT', or 'DEBIT'
+  const [filterType, setFilterType] = useState('ALL'); 
 
-  // --- FILTERING LOGIC ---
+ 
   const filteredHistory = myHistory.filter((tx) => {
     const isCredit = tx.recipient === user.accountNumber;
     const type = isCredit ? 'CREDIT' : 'DEBIT';
     
-    // 1. Check the button filters (All / In / Out)
+    
     if (filterType !== 'ALL' && filterType !== type) return false;
     
-    // 2. Check the search bar
+    
     const searchLower = searchTerm.toLowerCase();
     return (
       tx.desc.toLowerCase().includes(searchLower) ||
@@ -23,7 +23,7 @@ export default function Statements({ user, myHistory, isDarkMode }) {
     );
   });
 
-  // --- CSV GENERATOR LOGIC ---
+  
   const handleDownloadCSV = () => {
     let csvContent = "Date,Reference ID,Description,Counterparty,Type,Amount (USD),Status\n";
     
@@ -50,7 +50,7 @@ export default function Statements({ user, myHistory, isDarkMode }) {
   return (
     <div className="animate-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto mt-2 sm:mt-4 pb-8">
       
-      {/* HEADER SECTION */}
+      
       <div className="flex justify-between items-end mb-6 sm:mb-8">
         <div>
           <h2 className={`text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -61,7 +61,7 @@ export default function Statements({ user, myHistory, isDarkMode }) {
           </p>
         </div>
         
-        {/* DESKTOP EXPORT BUTTON (Hidden on mobile) */}
+       
         <button 
           onClick={handleDownloadCSV}
           className={`hidden sm:flex justify-center px-6 py-3 rounded-xl font-bold items-center gap-2 transition-colors shadow-sm ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'}`}
@@ -70,10 +70,10 @@ export default function Statements({ user, myHistory, isDarkMode }) {
         </button>
       </div>
 
-      {/* SEARCH AND FILTER BAR */}
+      
       <div className={`rounded-2xl p-4 sm:p-6 shadow-sm border mb-6 sm:mb-8 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
         
-        {/* Search Bar */}
+        
         <div className="relative flex-1 w-full">
           <Search className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
           <input 
@@ -85,7 +85,7 @@ export default function Statements({ user, myHistory, isDarkMode }) {
           />
         </div>
 
-        {/* Filter Buttons */}
+        
         <div className={`flex flex-wrap sm:flex-nowrap rounded-xl p-1 border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
           <button 
             onClick={() => setFilterType('ALL')}
@@ -108,10 +108,10 @@ export default function Statements({ user, myHistory, isDarkMode }) {
         </div>
       </div>
 
-      {/* THE STATEMENT TABLE */}
+      
       <div className={`rounded-2xl shadow-sm border overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
         
-        {/* Desktop Header (Hidden on Mobile) */}
+        
         <div className={`hidden sm:grid sm:grid-cols-5 px-4 sm:px-8 py-3 sm:py-4 border-b text-xs font-bold tracking-wider transition-colors ${isDarkMode ? 'bg-slate-900/50 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}>
           <div className="col-span-2">TRANSACTION DETAILS</div>
           <div>COUNTERPARTY</div>
@@ -119,7 +119,6 @@ export default function Statements({ user, myHistory, isDarkMode }) {
           <div className="text-right">AMOUNT</div>
         </div>
 
-        {/* Transaction Rows */}
         <div className={`divide-y transition-colors ${isDarkMode ? 'divide-slate-800' : 'divide-slate-100'}`}>
           {filteredHistory.length > 0 ? (
             filteredHistory.map((tx) => {
@@ -127,7 +126,7 @@ export default function Statements({ user, myHistory, isDarkMode }) {
               return (
                 <div key={tx.id} className={`flex sm:grid sm:grid-cols-5 items-center justify-between px-4 sm:px-8 py-4 sm:py-5 transition-colors ${isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}`}>
                   
-                  {/* Column 1 & 2: Icon & Name (Always Visible) */}
+                  
                   <div className="flex items-center gap-3 sm:gap-4 flex-1 sm:col-span-2 min-w-0 pr-4 sm:pr-0">
                     <div className={`p-2 sm:p-3 shrink-0 rounded-xl ${isCredit ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-50 text-green-600') : (isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600')}`}>
                       {isCredit ? <ArrowDownLeft className="w-4 h-4 sm:w-5 sm:h-5" /> : <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -138,21 +137,21 @@ export default function Statements({ user, myHistory, isDarkMode }) {
                     </div>
                   </div>
                   
-                  {/* Column 3: Counterparty (HIDDEN ON MOBILE) */}
+                  
                   <div className="hidden sm:block sm:col-span-1 min-w-0">
                     <span className={`text-xs sm:text-sm font-medium truncate block ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                       {isCredit ? tx.sender : tx.recipient}
                     </span>
                   </div>
 
-                  {/* Column 4: Reference ID (HIDDEN ON MOBILE) */}
+                
                   <div className="hidden sm:block sm:col-span-1 min-w-0">
                     <span className={`text-[10px] sm:text-xs font-mono px-2 py-1 rounded truncate max-w-[120px] lg:max-w-none ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-400'}`}>
                       {tx.id}
                     </span>
                   </div>
 
-                  {/* Column 5: Amount (Always Visible) */}
+                
                   <div className={`shrink-0 sm:col-span-1 text-right font-bold text-sm sm:text-lg ${isCredit ? (isDarkMode ? 'text-green-500' : 'text-green-600') : (isDarkMode ? 'text-slate-200' : 'text-slate-900')}`}>
                     {isCredit ? '+' : '-'}${tx.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
                   </div>
@@ -169,7 +168,7 @@ export default function Statements({ user, myHistory, isDarkMode }) {
         </div>
       </div>
 
-      {/* MOBILE EXPORT BUTTON (Hidden on desktop) */}
+      
       <button 
         onClick={handleDownloadCSV}
         className={`sm:hidden w-full mt-6 justify-center px-6 py-4 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-sm ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'}`}
