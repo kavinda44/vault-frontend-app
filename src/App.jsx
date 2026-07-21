@@ -1,46 +1,44 @@
-import { useState, useEffect } from 'react';
-import Auth from './Auth';
-import Dashboard from './Dashboard';
+import { useState, useEffect } from 'react'
+import Auth from './Auth'
+import Dashboard from './Dashboard'
 
-export default function App() {
-  // Check if a user is already logged in when the app first loads
+function App() {
+  // 1. Initialize state securely from localStorage to prevent refresh crashes
   const [loggedInUser, setLoggedInUser] = useState(() => {
-    const savedUser = localStorage.getItem("username");
+    const savedSession = localStorage.getItem("vault_session");
     const savedToken = localStorage.getItem("token");
     
-    // Only restore the session if BOTH the token and username exist
-    if (savedUser && savedToken) {
-      return { username: savedUser }; 
+    // Only restore the session if BOTH the token and full user data exist
+    if (savedSession && savedToken) {
+      return JSON.parse(savedSession); 
     }
     return null;
   });
 
-  // --- SECURE LOGOUT FUNCTION ---
+  // 2. Automatically save the full user object (including balance) whenever it updates
+  useEffect(() => {
+    if (loggedInUser) {
+      localStorage.setItem("vault_session", JSON.stringify(loggedInUser));
+    }
+  }, [loggedInUser]);
+
+  // 3. Secure logout destroys the JWT token and the session memory
   const handleLogout = () => {
-    // 1. Destroy the cryptographic token
     localStorage.removeItem("token");
-    
-    // 2. Remove the stored username
     localStorage.removeItem("username");
-    
-    // 3. Reset the application state to force a redirect to the login screen
+    localStorage.removeItem("vault_session"); 
     setLoggedInUser(null);
-  };
+  }
 
   return (
-    <div>
-      {/* 
-        If loggedInUser is null, show the Auth screen.
-        Otherwise, show the Dashboard and pass the handleLogout function to it.
-      */}
-      {!loggedInUser ? (
-        <Auth setLoggedInUser={setLoggedInUser} />
+    <>
+      {loggedInUser ? (
+        <Dashboard user={loggedInUser} handleLogout={handleLogout} />
       ) : (
-        <Dashboard 
-          user={loggedInUser} 
-          handleLogout={handleLogout} 
-        />
+        <Auth setLoggedInUser={setLoggedInUser} />
       )}
-    </div>
-  );
+    </>
+  )
 }
+
+export default App
