@@ -36,6 +36,11 @@ export default function Auth({ setLoggedInUser }) {
             const data = await response.json();
             
             if (response.ok) {
+                // --- NEW JWT UPDATE ---
+                // Save the secure token and username to the browser's local storage
+                localStorage.setItem("token", data.access_token);
+                localStorage.setItem("username", data.username);
+                
                 setLoggedInUser({
                     username: data.username,
                     accountNumber: data.account_number,

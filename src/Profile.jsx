@@ -26,9 +26,13 @@ export default function Profile({ user, onUpdateUser, isDarkMode }) {
 
     // 2. API Call
     try {
+      // --- JWT UPDATE ---
       const response = await fetch("https://vault-backend-api-szxu.onrender.com/user/update", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}` // ADDED JWT HEADER
+        },
         body: JSON.stringify({ 
             current_username: user.username,
             new_username: username,          
@@ -44,6 +48,9 @@ export default function Profile({ user, onUpdateUser, isDarkMode }) {
           ...user,
           username: username
         });
+
+        // Also update the stored username in localStorage so the session stays accurate
+        localStorage.setItem("username", username);
 
         setStatus(`✅ ${data.message}`);
         setCurrentPassword('');

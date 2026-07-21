@@ -48,7 +48,12 @@ export default function Dashboard({ user, handleLogout }) {
 
   const fetchGlobalHistory = async () => {
     try {
-      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/history/${username}`);
+      // --- JWT UPDATE ---
+      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/history/${username}`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setMyHistory(data.history);
@@ -85,7 +90,12 @@ export default function Dashboard({ user, handleLogout }) {
     setIsRefreshing(true);
     try {
       // 1. Fetch the freshest balance
-      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/refresh-account/${username}`);
+      // --- JWT UPDATE ---
+      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/refresh-account/${username}`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setCurrentBalance(data.balance);
@@ -109,9 +119,13 @@ export default function Dashboard({ user, handleLogout }) {
     e.preventDefault();
     setModalStatus("Generating secure OTP...");
     try {
+      // --- JWT UPDATE ---
       const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/request", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+        },
         body: JSON.stringify({ username: username, recipient_account: modalRecipient, amount: modalAmount, description: modalDesc || 'Quick Transfer' })
       });
       if (response.ok) {
@@ -131,9 +145,13 @@ export default function Dashboard({ user, handleLogout }) {
     setModalStatus("Verifying 2FA Code & Encrypting Payload...");
     setModalPayload('');
     try {
+      // --- JWT UPDATE ---
       const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/verify", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify({ username: username, otp: modalOtpCode })
       });
       const data = await response.json();

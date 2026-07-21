@@ -19,9 +19,13 @@ export default function Transfer({ user, currentBalance, onTransferSuccess, glob
     setTransferStatus("Generating secure OTP...");
     
     try {
+      // --- JWT UPDATE ---
       const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/request", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}` // ADDED JWT HEADER
+        },
         body: JSON.stringify({ username: username, recipient_account: recipient, amount: amount })
       });
 
@@ -43,9 +47,13 @@ export default function Transfer({ user, currentBalance, onTransferSuccess, glob
     setEncryptedPayload('');
 
     try {
+      // --- JWT UPDATE ---
       const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/verify", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}` // ADDED JWT HEADER
+        },
         body: JSON.stringify({ username: username, otp: otpCode })
       });
 
