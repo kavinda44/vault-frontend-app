@@ -36,7 +36,7 @@ export default function Auth({ setLoggedInUser }) {
             const data = await response.json();
             
             if (response.ok) {
-                // --- NEW JWT UPDATE ---
+              
                 // Save the secure token and username to the browser's local storage
                 localStorage.setItem("token", data.access_token);
                 localStorage.setItem("username", data.username);
@@ -90,7 +90,7 @@ export default function Auth({ setLoggedInUser }) {
             if (response.ok) {
                 setMessage(" Registration successful! Please check your email to verify your account.");
                 setIsPanelActive(false);
-                // Clear input states
+                
                 setRegUser('');
                 setRegEmail('');
                 setRegNic('');

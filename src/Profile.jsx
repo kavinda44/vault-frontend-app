@@ -31,7 +31,7 @@ export default function Profile({ user, onUpdateUser, isDarkMode }) {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` // ADDED JWT HEADER
+          "Authorization": `Bearer ${localStorage.getItem("token")}` 
         },
         body: JSON.stringify({ 
             current_username: user.username,
@@ -49,7 +49,7 @@ export default function Profile({ user, onUpdateUser, isDarkMode }) {
           username: username
         });
 
-        // Also update the stored username in localStorage so the session stays accurate
+        
         localStorage.setItem("username", username);
 
         setStatus(`✅ ${data.message}`);

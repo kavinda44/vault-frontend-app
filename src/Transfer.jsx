@@ -24,7 +24,7 @@ export default function Transfer({ user, currentBalance, onTransferSuccess, glob
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` // ADDED JWT HEADER
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({ username: username, recipient_account: recipient, amount: amount })
       });
@@ -52,7 +52,7 @@ export default function Transfer({ user, currentBalance, onTransferSuccess, glob
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` // ADDED JWT HEADER
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({ username: username, otp: otpCode })
       });

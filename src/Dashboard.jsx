@@ -13,7 +13,7 @@ import Settings from './Settings';
 
 export default function Dashboard({ user, handleLogout }) {
   
-  // --- USER PROFILE STATE ---
+  // USER PROFILE STATE 
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem(`vault_profile_${user.accountNumber}`);
     if (saved) return JSON.parse(saved);
@@ -24,7 +24,7 @@ export default function Dashboard({ user, handleLogout }) {
     localStorage.setItem(`vault_profile_${currentUser.accountNumber}`, JSON.stringify(currentUser));
   }, [currentUser]);
 
-  // --- DARK MODE STATE ---
+  // DARK MODE STATE 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('vault_dark_mode');
     return saved ? JSON.parse(saved) : false;
@@ -43,12 +43,12 @@ export default function Dashboard({ user, handleLogout }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activePage, setActivePage] = useState('home'); 
   
-  // --- UPGRADED: GLOBAL DATABASE HISTORY STATE ---
+  // GLOBAL DATABASE HISTORY STATE
   const [myHistory, setMyHistory] = useState([]);
 
   const fetchGlobalHistory = async () => {
     try {
-      // --- JWT UPDATE ---
+     
       const response = await fetch(`https://vault-backend-api-szxu.onrender.com/history/${username}`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -161,7 +161,7 @@ export default function Dashboard({ user, handleLogout }) {
         setModalPayload(data.raw_encrypted_payload);
         setCurrentBalance(prev => prev - parseFloat(modalAmount));
         
-        // UPGRADED: Pull the real history from the database instead of faking it!
+        
         await fetchGlobalHistory();
         
         setModalAmount('');
@@ -437,11 +437,11 @@ export default function Dashboard({ user, handleLogout }) {
             <Transfer 
               user={currentUser} 
               currentBalance={currentBalance} 
-              globalHistory={myHistory} // UPGRADED
+              globalHistory={myHistory} 
               setGlobalHistory={setMyHistory} 
               onTransferSuccess={(amountDeducted) => {
                 setCurrentBalance(prev => prev - amountDeducted);
-                fetchGlobalHistory(); // Auto-refreshes history when Transfer component finishes!
+                fetchGlobalHistory(); 
               }} 
               isDarkMode={isDarkMode}
             />
@@ -450,7 +450,7 @@ export default function Dashboard({ user, handleLogout }) {
           {activePage === 'statements' && (
             <Statements 
               user={currentUser} 
-              myHistory={myHistory} // UPGRADED
+              myHistory={myHistory} 
               isDarkMode={isDarkMode}
             />
           )}
