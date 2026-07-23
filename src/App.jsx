@@ -22,13 +22,35 @@ function App() {
     }
   }, [loggedInUser]);
 
-  // 3. Secure logout destroys the JWT token and the session memory
-  const handleLogout = () => {
+  // 3. Secure logout destroys the JWT token, revokes the refresh token, and clears the session
+  const handleLogout = async () => {
+    try {
+      await fetch("https://vault-backend-api-szxu.onrender.com/logout", {
+        method: "POST",
+        credentials: "include",  // sends the httpOnly cookie so the server can revoke it
+      });
+    } catch (error) {
+      console.error("Logout request failed:", error);
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     localStorage.removeItem("vault_session"); 
     setLoggedInUser(null);
   }
+
+  // 4. Listen for session-expired events from the api.js refresh interceptor
+  useEffect(() => {
+    const onSessionExpired = () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("vault_session");
+      setLoggedInUser(null);
+    };
+
+    window.addEventListener("session-expired", onSessionExpired);
+    return () => window.removeEventListener("session-expired", onSessionExpired);
+  }, []);
 
   return (
     <>

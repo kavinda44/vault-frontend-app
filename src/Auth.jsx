@@ -31,6 +31,7 @@ export default function Auth({ setLoggedInUser }) {
             const response = await fetch("https://vault-backend-api-szxu.onrender.com/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({ username: loginUser, password: loginPass })
             });
             const data = await response.json();

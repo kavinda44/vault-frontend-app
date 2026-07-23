@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ShieldCheck, Lock, DollarSign, CheckCircle2, Clock, ArrowUpRight, ArrowDownLeft, MessageSquare } from 'lucide-react';
+import apiFetch from './api';
 
 export default function Transfer({ user, currentBalance, onTransferSuccess, globalHistory, setGlobalHistory, isDarkMode }) {
   const username = user.username;
@@ -20,11 +21,10 @@ export default function Transfer({ user, currentBalance, onTransferSuccess, glob
     
     try {
       // --- JWT UPDATE ---
-      const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/request", {
+      const response = await apiFetch("/transfer/request", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ username: username, recipient_account: recipient, amount: amount })
       });
@@ -48,11 +48,10 @@ export default function Transfer({ user, currentBalance, onTransferSuccess, glob
 
     try {
       // --- JWT UPDATE ---
-      const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/verify", {
+      const response = await apiFetch("/transfer/verify", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ username: username, otp: otpCode })
       });

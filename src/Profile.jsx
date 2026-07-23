@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { User, Lock, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import apiFetch from './api';
 
 export default function Profile({ user, onUpdateUser, isDarkMode }) {
   const [username, setUsername] = useState(user.username || '');
@@ -27,11 +28,10 @@ export default function Profile({ user, onUpdateUser, isDarkMode }) {
     // 2. API Call
     try {
       // --- JWT UPDATE ---
-      const response = await fetch("https://vault-backend-api-szxu.onrender.com/user/update", {
+      const response = await apiFetch("/user/update", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ 
             current_username: user.username,

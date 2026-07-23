@@ -10,6 +10,7 @@ import Transfer from './Transfer';
 import Statements from './Statements'; 
 import Profile from './Profile'; 
 import Settings from './Settings'; 
+import apiFetch from './api';
 
 export default function Dashboard({ user, handleLogout }) {
   
@@ -49,11 +50,7 @@ export default function Dashboard({ user, handleLogout }) {
   const fetchGlobalHistory = async () => {
     try {
      
-      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/history/${username}`, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
-        }
-      });
+      const response = await apiFetch(`/history/${username}`);
       if (response.ok) {
         const data = await response.json();
         setMyHistory(data.history);
@@ -91,11 +88,7 @@ export default function Dashboard({ user, handleLogout }) {
     try {
       // 1. Fetch the freshest balance
       // --- JWT UPDATE ---
-      const response = await fetch(`https://vault-backend-api-szxu.onrender.com/refresh-account/${username}`, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
-        }
-      });
+      const response = await apiFetch(`/refresh-account/${username}`);
       if (response.ok) {
         const data = await response.json();
         setCurrentBalance(data.balance);
@@ -120,11 +113,10 @@ export default function Dashboard({ user, handleLogout }) {
     setModalStatus("Generating secure OTP...");
     try {
       // --- JWT UPDATE ---
-      const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/request", {
+      const response = await apiFetch("/transfer/request", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ username: username, recipient_account: modalRecipient, amount: modalAmount, description: modalDesc || 'Quick Transfer' })
       });
@@ -146,11 +138,10 @@ export default function Dashboard({ user, handleLogout }) {
     setModalPayload('');
     try {
       // --- JWT UPDATE ---
-      const response = await fetch("https://vault-backend-api-szxu.onrender.com/transfer/verify", {
+      const response = await apiFetch("/transfer/verify", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ username: username, otp: modalOtpCode })
       });
